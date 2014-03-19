@@ -1,8 +1,11 @@
+
 django-admin-chat
 
 ========================================
 
-About : Admin user can chat with one another . ToDo : admin can chat with any user .
+About : Admin user can chat with one another . 
+
+Todo : admin can chat with any user .
 
 Dependencies : 
 
@@ -31,10 +34,10 @@ perform `syncdb` :
     python manage.py syncdb
 
 Go to chat application folder :    
-    go to nodejs directory 
-        cd nodejs
+    #go to nodejs directory 
+    cd nodejs
     
-    Run following commands . make sure 'npm' is installed.
+    #Run following commands . make sure 'npm' is installed.
     
     #https://github.com/LearnBoost/socket.io
     npm install socket.io
@@ -42,8 +45,8 @@ Go to chat application folder :
     #https://github.com/shtylman/node-cookie
     npm install cookie
     
-    run : chat.js server js.
-        node chat.js
+    #run : chat.js server js.
+    node chat.js
 
 Start development server at default port (8000)  :
 
