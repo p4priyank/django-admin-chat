@@ -1,4 +1,3 @@
-
 django-admin-chat
 
 ========================================
@@ -35,6 +34,7 @@ perform `syncdb` :
 
 Go to chat application folder :    
     #go to nodejs directory 
+    
     cd nodejs
     
     #Run following commands . make sure 'npm' is installed.
