@@ -25,6 +25,7 @@ def chat_with_user(request, user_id = None):
         user_id = User.objects.get(pk = user_id)
         chat_id = ChatSenderRecipient.objects.create(user_1 = request.user, user_2 = user_id)
 
+    extra_context['user_id']    =   user_id
     extra_context['chat_id']    =   chat_id.id
     return render_to_response('chat_with_user.html', extra_context, context_instance=RequestContext(request))
     
@@ -35,10 +36,16 @@ def node_api(request, chat_id = None):
         session = Session.objects.get(session_key=request.POST.get('sessionid'))
         user_id = session.get_decoded().get('_auth_user_id')
         user = User.objects.get(id=user_id)
+        chatsenderrecipient = ChatSenderRecipient.objects.get(pk = chat_id)
+        if chatsenderrecipient.user_1.id == user_id:
+            r_user_id = chatsenderrecipient.user_2.id
+        else:
+            r_user_id = chatsenderrecipient.user_1.id
         #Create comment
         # Comments.objects.create(user=user, text=request.POST.get('comment'))
         #Once comment has been created post it to the chat channel
         r = redis.StrictRedis(host='localhost', port=6379, db=0)
+        r.publish('userchannel' + str(r_user_id), str(user.id))
         r.publish('message' + chat_id, user.username + ': ' + request.POST.get('comment'))
         return HttpResponse("Everything worked :)")
     except Exception, e:

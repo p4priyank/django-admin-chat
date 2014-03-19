@@ -36,10 +36,12 @@ io.sockets.on('connection', function (socket) {
     socket.on('send_message', function (message) {
 
         target_chat_id = JSON.parse(message)['chat_id'];
+        target_user_id = JSON.parse(message)['user_id'];
         var message =   JSON.parse(message)['msg'];
         
         // subscribe to created channel
         sub.subscribe('message'+target_chat_id);
+        sub.subscribe('userchannel'+target_user_id);
         
         values = querystring.stringify({
             comment: message,

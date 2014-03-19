@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:request.META.HTTP_HOST }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">Custom Django Administration - Priyank </h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrahead %}
+    <script src="http://localhost:4000/socket.io/socket.io.js"></script>
+    <script>
+            var window_opn_status   =   false;
+            var socket = io.connect('localhost', {port: 4000});
+            socket.on('connect', function(){
+                //console.log("connect");
+            });
+            socket.on('userchannel{{request.user.id}}', function(message) {
+                var chat_with_user_id = message;
+                if (window_opn_status == false){
+                    window.open('/chatwithuser/' + chat_with_user_id, name='Chat Window','height=500,width=800,resizable=yes,scrollbars=yes');
+                    window_opn_status   =   true;
+                }
+            });
+    </script>
+{% endblock %}
