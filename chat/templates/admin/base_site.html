@@ -9,19 +9,78 @@
 {% block nav-global %}{% endblock %}
 
 {% block extrahead %}
+    <style>
+        .chatdiv{
+            background-color: #EEEEEE;
+            bottom: 0;
+            font-size: 8pt;
+            height: 200px;
+            position: fixed;
+            right: 0;
+            width: 180px;
+        }
+        .comments{
+            bottom: 0;
+            height: 35px !important;
+            position: fixed;
+            width: 180px !important;
+        }
+    </style>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
     <script src="http://localhost:4000/socket.io/socket.io.js"></script>
     <script>
             var window_opn_status   =   false;
-            var socket = io.connect('localhost', {port: 4000});
-            socket.on('connect', function(){
-                //console.log("connect");
+            var chat_id;
+            var user_id;
+            var entry_el;
+            $(document).ready(function(){
+                var socket = io.connect('localhost', {port: 4000});
+                socket.on('connect', function(){
+                    //console.log("connect");
+                });
+                socket.on('userchannel{{request.user.id}}', function(message) {
+                    chat_id = message.split('-')[1];
+                    user_id = message.split('-')[0];
+                    if (window_opn_status == false){
+                        
+                        var div_html = '<div id=\'chatdiv\' class=\'chatdiv\'><ul id="comments"></ul><input type="text" id="comment" name="comment" class="comments" /></div>'
+                        var $chatdiv = $(div_html).appendTo('body');
+                        
+                        //window.open('/chatwithuser/' + chat_with_user_id, name='Chat Window','height=500,width=800,resizable=yes,scrollbars=yes');
+                        window_opn_status   =   true;
+                        var entry_el = $('#comment');
+                        entry_el.keypress(function(event){
+                            //When enter is pressed send input value to node server
+                            if(event.keyCode != 13) return;
+                            
+                            var msg = entry_el.attr('value');
+                            msg_obj = {'chat_id': chat_id, 'msg': msg, 'user_id' : user_id }
+                            //alert(chat_id);
+                            //alert(user_id);
+                            
+                            msg = JSON.stringify(msg_obj)
+                            if(msg){
+                                socket.emit('send_message', msg, function(data){
+                                    console.log(data);
+                                });
+                                //Clear input value
+                                entry_el.attr('value', '');
+                            }
+                        });
+                        socket.on('message'+chat_id, function(message) {
+                            //Escape HTML characters
+                            var data = message.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+                            //Append message to the bottom of the list
+                            $('#comments').append('<li>' + data + '</li>');
+                            //$('#comments').scrollBy(0, 10000000000);
+                            entry_el.focus();
+                        });
+                    }
+                });
+                
+                
+                
             });
-            socket.on('userchannel{{request.user.id}}', function(message) {
-                var chat_with_user_id = message;
-                if (window_opn_status == false){
-                    window.open('/chatwithuser/' + chat_with_user_id, name='Chat Window','height=500,width=800,resizable=yes,scrollbars=yes');
-                    window_opn_status   =   true;
-                }
-            });
+
     </script>
 {% endblock %}
